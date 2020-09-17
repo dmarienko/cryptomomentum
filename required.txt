@@ -5,13 +5,12 @@ pandas-datareader
 sklearn
 matplotlib
 statsmodels
-flask
 patool
 airspeed
-quandl
 bs4
 dill
-sortedcontainers
-cython
 numba
 seaborn
+tqdm
+python-binance
+
