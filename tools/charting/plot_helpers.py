@@ -12,11 +12,91 @@ try:
     import matplotlib.pyplot as plt
     import matplotlib.ticker as mticker
 except:
-    print("Can't import matplotlib modules in ira charting modlue")
+    print("Can't import matplotlib modules in charting modlue")
 
 from tools.analysis.tools import isscalar
 from tools.charting.mpl_finance import ohlc_plot
 
+
+def setup_mpl_theme(theme='dark'):
+    from cycler import cycler
+    import matplotlib
+    
+    DARK_MPL_THEME = [
+        ('backend', 'module://ipykernel.pylab.backend_inline'),
+        ('interactive', True),
+        ('lines.color', '#5050f0'),
+        ('text.color', '#d0d0d0'),
+        ('axes.facecolor', '#000000'),
+        ('axes.edgecolor', '#404040'),
+        ('axes.grid', True),
+        ('axes.labelsize', 'large'),
+        ('axes.labelcolor', 'green'),
+        ('axes.prop_cycle', cycler('color', ['#449AcD', 'g', '#f62841', 'y', '#088487', '#E24A33', '#f01010'])),
+        ('legend.fontsize', 'small'),
+        ('legend.fancybox', False),
+        ('legend.edgecolor', '#305030'),
+        ('legend.shadow', False),
+        ('lines.antialiased', True),
+        ('lines.linewidth', 0.8), # reduced line width
+        ('patch.linewidth', 0.5),
+        ('patch.antialiased', True),
+        ('xtick.color', '#909090'),
+        ('ytick.color', '#909090'),
+        ('xtick.labelsize', 'small'),
+        ('ytick.labelsize', 'small'),
+        ('grid.color', '#404040'),
+        ('grid.linestyle', '--'),
+        ('grid.linewidth', 0.5),
+        ('grid.alpha', 0.8),
+        ('figure.figsize', [8.0, 5.0]),
+        ('figure.dpi', 80.0),
+        ('figure.facecolor', '#000000'),
+        ('figure.edgecolor', (1, 1, 1, 0)),
+        ('figure.subplot.bottom', 0.125)
+    ]
+
+    LIGHT_MPL_THEME = [
+        ('backend', 'module://ipykernel.pylab.backend_inline'),
+        ('interactive', True),
+        ('lines.color', '#101010'),
+        ('text.color', '#303030'),
+        ('lines.antialiased', True),
+        ('lines.linewidth', 1),
+        ('patch.linewidth', 0.5),
+        ('patch.facecolor', '#348ABD'),
+        ('patch.edgecolor', '#eeeeee'),
+        ('patch.antialiased', True),
+        ('axes.facecolor', '#fafafa'),
+        ('axes.edgecolor', '#d0d0d0'),
+        ('axes.linewidth', 1),
+        ('axes.titlesize', 'x-large'),
+        ('axes.labelsize', 'large'),
+        ('axes.labelcolor', '#555555'),
+        ('axes.axisbelow', True),
+        ('axes.grid', True),
+        ('axes.prop_cycle', cycler('color', ['#6792E0', '#27ae60', '#c44e52', '#975CC3', '#ff914d', '#77BEDB',
+                                             '#303030', '#4168B7', '#93B851', '#e74c3c', '#bc89e0', '#ff711a',
+                                             '#3498db', '#6C7A89'])),
+        ('legend.fontsize', 'small'),
+        ('legend.fancybox', False),
+        ('xtick.color', '#707070'),
+        ('ytick.color', '#707070'),
+        ('grid.color', '#606060'),
+        ('grid.linestyle', '--'),
+        ('grid.linewidth', 0.5),
+        ('grid.alpha', 0.3),
+        ('figure.figsize', [8.0, 5.0]),
+        ('figure.dpi', 80.0),
+        ('figure.facecolor', '#ffffff'),
+        ('figure.edgecolor', '#ffffff'),
+        ('figure.subplot.bottom', 0.1)
+    ]
+    
+    t = DARK_MPL_THEME if 'dark' in theme.lower() else LIGHT_MPL_THEME
+    for (k, v) in t:
+        matplotlib.rcParams[k] = v
+        
 
 def fig(w=16, h=5, dpi=96, facecolor=None, edgecolor=None, num=None):
     """
@@ -106,3 +186,5 @@ def plot_trends(trends, uc='w--', dc='c--', lw=0.7, ms=5, fmt='%H:%M'):
         import datetime
         ax = plt.gca()
         ax.set_xticklabels([datetime.date.strftime(num2date(x), fmt) for x in ax.get_xticks()])
+
+setup_mpl_theme('dark')
