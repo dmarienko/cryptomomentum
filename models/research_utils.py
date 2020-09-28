@@ -25,7 +25,7 @@ def find_rhl_breakouts(data, timeframe, period, timezone='UTC'):
     return mstruct(poi=poi, hilo=hilo)
 
 
-def rough_simulation(poi, trade_long, trade_short, fwd_returns, holding_time, commissions):
+def rough_simulation(poi, data, trade_long, trade_short, fwd_returns, holding_time, commissions):
     """
     Very rough tradeability simulation.
     Uses:
@@ -39,8 +39,8 @@ def rough_simulation(poi, trade_long, trade_short, fwd_returns, holding_time, co
     sells = poi[poi < 0]   # short when breask rolling low
     holding_time = f'F{holding_time}' if isinstance(holding_time, int) else holding_time
     
-    pfl = pd.concat((+trade_long * r.loc[buys.index][holding_time], 
-                     -trade_short * r.loc[sells.index][holding_time]), axis=0).sort_index()
+    pfl = pd.concat((+trade_long * fwd_returns.loc[buys.index][holding_time], 
+                     -trade_short * fwd_returns.loc[sells.index][holding_time]), axis=0).sort_index()
 
     # we use double commissions (open and close position)
     comms = 2*data.loc[pfl.index].close * commissions

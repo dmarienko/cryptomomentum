@@ -734,40 +734,38 @@ def rsi(x, periods, smoother=sma):
     return 100 * mu / (mu + md)
 
 
-def pivot_point(data, method='classic'):
+def pivot_point(data, method='classic', timeframe='D', timezone='EET'):
     """
-    Pivot points indicator  based on daily data
+    Pivot points indicator based on {daily, weekly or monthy} data
     it supports 'classic', 'woodie' and 'camarilla' species
     """
-    freq_sec = pd.Timedelta(data.index.freq).total_seconds()
-    if np.isnan(freq_sec) or freq_sec < 3600 * 24:
-        x = ohlc_resample(data, "1D", resample_tz="EET")
-    elif freq_sec > 3600 * 24:
-        raise ValueError("Input series must be resampled in days bars or less")
-    else:
-        x = data
+    if timeframe not in ['D', 'W', 'M']:
+        raise ValueError("Wrong timeframe parameter value, only 'D', 'W' and 'M' allowed")
+        
+    x = ohlc_resample(data, f'1{timeframe}', resample_tz=timezone)
+    
     pp = pd.DataFrame()
     if method == 'classic':
         pvt = (x.high + x.low + x.close) / 3
         _range = x.high - x.low
-        
+
         pp['R4'] = pvt + 3 * _range
         pp['R3'] = pvt + 2 * _range
-        pp['R2'] = pvt + _range 
+        pp['R2'] = pvt + _range
         pp['R1'] = pvt * 2 - x.low
-        pp['P']  = pvt
+        pp['P'] = pvt
         pp['S1'] = pvt * 2 - x.high
         pp['S2'] = pvt - _range
         pp['S3'] = pvt - 2 * _range
         pp['S4'] = pvt - 3 * _range
-        
+
         # rearrange
-        pp = pp[['R4','R3','R2','R1','P','S1','S2','S3','S4']]
-        
+        pp = pp[['R4', 'R3', 'R2', 'R1', 'P', 'S1', 'S2', 'S3', 'S4']]
+
     elif method == 'woodie':
         pvt = (x.high + x.low + x.open + x.open) / 4
         _range = x.high - x.low
-        
+
         pp['R3'] = x.high + 2 * (pvt - x.low)
         pp['R2'] = pvt + _range
         pp['R1'] = pvt * 2 - x.low
@@ -775,8 +773,8 @@ def pivot_point(data, method='classic'):
         pp['S1'] = pvt * 2 - x.high
         pp['S2'] = pvt - _range
         pp['S3'] = x.low + 2 * (x.high - pvt)
-        pp = pp[['R3','R2','R1','P','S1','S2','S3']]
-        
+        pp = pp[['R3', 'R2', 'R1', 'P', 'S1', 'S2', 'S3']]
+
     elif method == 'camarilla':
         """
             R4 = C + RANGE * 1.1/2
@@ -791,7 +789,7 @@ def pivot_point(data, method='classic'):
         """
         pvt = (x.high + x.low + x.close) / 3
         _range = x.high - x.low
-        
+
         pp['R4'] = x.close + _range * 1.1 / 2
         pp['R3'] = x.close + _range * 1.1 / 4
         pp['R2'] = x.close + _range * 1.1 / 6
@@ -801,7 +799,7 @@ def pivot_point(data, method='classic'):
         pp['S2'] = x.close - _range * 1.1 / 6
         pp['S3'] = x.close - _range * 1.1 / 4
         pp['S4'] = x.close - _range * 1.1 / 2
-        pp = pp[['R4','R3','R2','R1','P','S1','S2','S3','S4']]
+        pp = pp[['R4', 'R3', 'R2', 'R1', 'P', 'S1', 'S2', 'S3', 'S4']]
     else:
         raise ValueError("Unknown method %s. Available methods is classic, woodie, camarilla" % method)
 
