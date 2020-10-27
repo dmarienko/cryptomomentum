@@ -34,6 +34,7 @@ class RollingHiLo(BreaksDetector):
         return self.hilo['Bot']
     
     def get_breaks(self, ohlc):
+        ohlc = ohlc.shift(1)
         d_1 = ohlc.shift(1)[['open', 'close']].rename(columns={'open': 'open_1', 'close': 'close_1'})
         t = pd.concat((ohlc[['open', 'close']], d_1, self.hilo), axis=1)
         t.fillna(method='ffill', inplace=True)
@@ -103,7 +104,7 @@ class TurtlesGenerator:
         days['N'] = np.nan
         
         # first N based on 20-day average true range
-        firstN = np.mean(days[20:]['TR'])
+        firstN = np.mean(days[1:20]['TR'])
         n_col = days.columns.get_loc('N')
         days.iloc[21, n_col] = firstN 
 
