@@ -804,13 +804,13 @@ def pivot_point(data, method='classic', timeframe='D', timezone='EET'):
     else:
         raise ValueError("Unknown method %s. Available methods are classic, woodie, camarilla" % method)
 
-    pp.index = pp.index + pd.Timedelta(tf_resample)
+    pp.index = pp.index + pd.Timedelta('1d')
     return data.combine_first(pp).fillna(method='ffill')[pp.columns]
 
 
 def intraday_min_max(data, timezone='EET'):
     """
-    Intradeay min and max values
+    Intraday min and max values
     :param data: ohlcv series
     :return: series with min and max values intraday
     """
@@ -832,3 +832,11 @@ def intraday_min_max(data, timezone='EET'):
     x = x.tz_convert(timezone)
     return x.groupby(x.index.date).apply(_day_min_max).tz_convert(source_tz)
 
+
+def rolling_autocorrelation(x, lag, period):
+    """
+    Timeseries rolling autocorrelation indicator
+    :param period: rolling window 
+    :param lag: lagged shift used for finding correlation coefficient
+    """
+    return x.rolling(period).corr(x.shift(lag))
