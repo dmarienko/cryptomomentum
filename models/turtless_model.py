@@ -105,16 +105,20 @@ class TurtlesGenerator:
         
         # first N based on 20-day average true range
         firstN = np.mean(days[1:20]['TR'])
+        
         n_col = days.columns.get_loc('N')
         days.iloc[21, n_col] = firstN 
 
         # calculate N for every day
         prevN = firstN
-        for i in range(22, len(days)):
+        for i in range(21, len(days)):
             row = days.iloc[i]
             currN = (19 * prevN + row['TR']) / 20
             days.iloc[i, n_col] = currN
             prevN = currN
+#             print(currN)
+            
+#         print(days.dropna().head(22))
         
         # run 'trading' and collect signals in sigs dict
         entries = []

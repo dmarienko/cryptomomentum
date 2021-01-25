@@ -12,6 +12,11 @@ from ira.analysis.portfolio import split_cumulative_pnl
 from ira.utils.nb_functions import z_load, z_test_signals_inplace
 
 
+
+def load_data(instrument):
+    return {instrument: load_binance_data(instrument, '1m', path='../data')}
+
+
 def prepare_data(instrument, timeframes=['1D', '1H', '5Min']):
     """
     Just convenient method for prepring data
