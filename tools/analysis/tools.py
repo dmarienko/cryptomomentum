@@ -421,3 +421,15 @@ def srows(*xs, keep='all', sort=True):
     if keep != 'all':
         r = drop_duplicated_indexes(r, keep=keep)
     return r
+
+
+def shift_signals(sigs, forward: str = None, days=0, hours=0, minutes=0, seconds=0):
+    """
+    Shift signal time into future.
+
+    :return: shifted signals frame
+    """
+    n_sigs = sigs.copy()
+    f0 = pd.Timedelta(forward if forward is not None else 0)
+    n_sigs.index = n_sigs.index + f0 + pd.DateOffset(days=days, hours=hours, minutes=minutes, seconds=seconds)
+    return n_sigs
