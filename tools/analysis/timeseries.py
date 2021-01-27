@@ -680,7 +680,7 @@ def rolling_series_slope(x, period, method='ols', scaling='transform', n_bins=5)
     return roll_slope
 
 
-def adx(ohlc, period, smoother=kama):
+def adx(ohlc, period, smoother=kama, as_frame=False):
     """
     Average Directional Index.
 
@@ -699,7 +699,8 @@ def adx(ohlc, period, smoother=kama):
     :param ohlc: DataFrame with ohlc data
     :param period: indicator period
     :param smoother: smoothing function (kama is default)
-    :return: adx, DIp, DIm
+    :param as_frame: set to True if DataFrame needed as result (default false) 
+    :return: adx, DIp, DIm or DataFrame
     """
     if not (isinstance(ohlc, pd.DataFrame) and sum(ohlc.columns.isin(['open', 'high', 'low', 'close'])) == 4):
         raise ValueError("Input series must be DataFrame within 'open', 'high', 'low' and 'close' columns defined !")
@@ -714,6 +715,9 @@ def adx(ohlc, period, smoother=kama):
     DIm = 100 * smooth(DMm, smoother, period) / _atr
     _adx = 100 * smooth(abs((DIp - DIm) / (DIp + DIm)), smoother, period)
 
+    if as_frame:
+        return pd.concat((_adx.rename('ADX'), DIp.rename('DIp'), DIm.rename('DIm')), axis=1)
+    
     return _adx.rename('ADX'), DIp.rename('DIp'), DIm.rename('DIm')
 
 

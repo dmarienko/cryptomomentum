@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+from tools.analysis.timeseries import *
+
 
 class RangeSelector:
     def __init__(self):
@@ -73,3 +75,48 @@ class MarketRegime(RangeSelector):
     def get_id(self):
         cn = self.__class__.__name__
         return cn + '(' + ','.join([f'{n}={v}' for n,v in self.__dict__.items() if not n.startswith('_')]) + ')'
+    
+
+class ADXRegime(MarketRegime):
+    """
+    Classical ADX regime detector
+      1: trend regime (adx > T)
+      0: flat regime
+    """
+    def calculate(self, data, prevent_shift):
+        # adx uses H/L so we should shift it
+        ind = adx(data, self.period, sma, as_frame=True).shift(1)
+        r = pd.Series(0, index=ind.index)
+        r[ind.ADX > self.threshold] = 1
+        return r
+    
+    
+class AcorrRegime(MarketRegime):
+    """
+    Regime based returns series autocorrelation 
+      -1: mean reversion regime (negative correlation < t_mr)
+       0: uncertain (t_mr < corr < r_mo)
+      +1: momentum regime (positive correlation > t_mo)
+    """
+    def calculate(self, data, prevent_shift):
+        sft_num = 0 if self._column != 'close' or prevent_shift else 1
+        returns = data[self._column].pct_change()
+        ind = rolling_autocorrelation(returns, self.lag, self.period).shift(sft_num)
+        r = pd.Series(0, index=ind.index)
+        r[ind <= self.t_mr] = -1
+        r[ind >= self.t_mo] = +1
+        return r
+    
+    
+class VolatilityRegime(MarketRegime):
+    """
+    Regime based on volatility
+       0: flat
+      +1: volatile market 
+    """
+    def calculate(self, data, prevent_shift):
+        inst_vol = atr(data, self.instant_period)
+        typical_vol = atr(data, self.typical_period)
+        r = pd.Series(0, index=data.index)
+        r[inst_vol > typical_vol * self.factor] = +1
+        return r
